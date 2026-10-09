@@ -4,7 +4,7 @@ import Reveal from './Reveal.jsx';
 import { business } from '../data/content.js';
 import { mailLink, requestJourney, whatsappLink } from '../lib/links.js';
 import { contact } from '../data/content.js';
-import { cardIn, ease, fadeSide, fadeUp, maskLine, spring, stagger } from '../lib/motion.js';
+import { cardIn, ease, fadeSide, fadeUp, listItem, maskLine, spring, stagger, viewport } from '../lib/motion.js';
 
 export default function Business() {
   return (
@@ -47,20 +47,14 @@ export default function Business() {
 
           <Reveal as="div" className="partners" variants={fadeSide(32)}>
             <p className="micro-label">{business.partnersLabel}</p>
-            <ul className="partners__list">
-              {business.partners.map((partner, i) => (
-                <motion.li
-                  key={partner.title}
-                  initial={{ opacity: 0, y: 12 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  transition={{ duration: 0.45, ease, delay: 0.2 + i * 0.09 }}
-                >
+            <motion.ul className="partners__list" variants={stagger(0.09, 0.2)}>
+              {business.partners.map((partner) => (
+                <motion.li key={partner.title} variants={listItem({ y: 12 })}>
                   <span className="partners__title">{partner.title}</span>
                   <span className="partners__body">{partner.body}</span>
                 </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </Reveal>
         </div>
 
@@ -105,20 +99,14 @@ export default function Business() {
 
           <motion.div className="account__benefits" variants={cardIn}>
             <p className="micro-label micro-label--onDark">{business.account.benefitsLabel}</p>
-            <ul>
-              {business.account.benefits.map((benefit, i) => (
-                <motion.li
-                  key={benefit}
-                  initial={{ opacity: 0, x: -12 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, amount: 0.5 }}
-                  transition={{ duration: 0.35, ease, delay: 0.3 + i * 0.07 }}
-                >
+            <motion.ul variants={stagger(0.07, 0.25)}>
+              {business.account.benefits.map((benefit) => (
+                <motion.li key={benefit} variants={listItem({ x: -12 })}>
                   <Icon name="check" size={15} strokeWidth={2.2} />
                   {benefit}
                 </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </motion.div>
         </Reveal>
       </div>

@@ -26,7 +26,20 @@ export const springSoft = { type: 'spring', stiffness: 260, damping: 32 };
  * Scroll reveals play once and start a little before the element is fully in
  * view, so content is already settled by the time it is worth reading.
  */
-export const viewport = { once: true, amount: 0.2, margin: '0px 0px -60px 0px' };
+/**
+ * Scroll reveals play once, triggered as soon as any part of the element clears
+ * the bottom margin.
+ *
+ * `amount` is deliberately 'some' rather than a fraction. An IntersectionObserver
+ * is only sampled once a frame, so a fractional threshold gives a narrow window
+ * that a fast scroll can jump clean over — a flick on a phone, a scrollbar drag,
+ * a restored scroll position. Combined with `once: true` the reveal then never
+ * fires and the content is left sitting at its hidden value. 'some' widens the
+ * window to the element's own height plus the viewport, which no realistic
+ * scroll can skip. Every reveal on the site shares this object; per-element
+ * thresholds are what caused that bug, so prefer a delay over a new threshold.
+ */
+export const viewport = { once: true, amount: 'some', margin: '0px 0px -40px 0px' };
 
 export const fadeUp = {
   hidden: { opacity: 0, y: 22 },
@@ -63,6 +76,24 @@ export const cardIn = {
 export const maskLine = {
   hidden: { y: '125%' },
   show: (delay = 0) => ({ y: '0%', transition: { duration: 0.75, ease, delay } }),
+};
+
+/**
+ * A list item arriving in sequence. These are driven by their parent's
+ * `staggerChildren` rather than each item watching the viewport itself: a
+ * per-item observer can be skipped independently of its section on a fast
+ * scroll, which left single bullets invisible. One observer per section cannot
+ * desync from the content around it.
+ */
+export const listItem = ({ x = 0, y = 0 } = {}) => ({
+  hidden: { opacity: 0, x, y },
+  show: { opacity: 1, x: 0, y: 0, transition: { duration: 0.38, ease } },
+});
+
+/** The map pin dropping onto a destination card. */
+export const pinDrop = {
+  hidden: { opacity: 0, y: -8 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 500, damping: 18 } },
 };
 
 /**

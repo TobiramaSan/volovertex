@@ -13,6 +13,29 @@ export function whatsappLink(key = 'default') {
   return number ? `https://wa.me/${number}?text=${text}` : '#request-assistance';
 }
 
+/**
+ * Build a WhatsApp deep link carrying a message the visitor composed themselves.
+ *
+ * This is what the intercom hands off to. Opening wa.me means the visitor's own
+ * WhatsApp does the sending, which is the point: WhatsApp has no notion of a
+ * sender who is not a WhatsApp number, and because *they* message first, their
+ * send opens the 24-hour customer service window in which we can reply freely.
+ *
+ * Falls back to the request form anchor while the number is still a placeholder,
+ * so the intercom degrades to the form rather than to a dead link.
+ */
+export function whatsappCompose(text) {
+  const number = digitsOnly(contact.whatsappNumber);
+  if (!number) return '#request-assistance';
+  const body = String(text || '').trim() || whatsappMessages.default;
+  return `https://wa.me/${number}?text=${encodeURIComponent(body)}`;
+}
+
+/** True when a real WhatsApp number is configured, so callers can adapt copy. */
+export function hasWhatsapp() {
+  return Boolean(digitsOnly(contact.whatsappNumber));
+}
+
 /** Build a tel: link. Falls back to the request form anchor if no number is set. */
 export function telLink() {
   const number = digitsOnly(contact.phoneDial);

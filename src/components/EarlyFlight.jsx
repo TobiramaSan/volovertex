@@ -3,7 +3,7 @@ import Icon from './Icon.jsx';
 import Reveal from './Reveal.jsx';
 import { earlyFlight } from '../data/content.js';
 import { requestJourney, whatsappLink } from '../lib/links.js';
-import { ease, fadeSide, fadeUp, maskLine, spring, stagger } from '../lib/motion.js';
+import { ease, fadeSide, fadeUp, listItem, maskLine, spring, stagger, viewport } from '../lib/motion.js';
 
 export default function EarlyFlight() {
   return (
@@ -62,19 +62,14 @@ export default function EarlyFlight() {
         <Reveal as="div" className="problem-card" variants={fadeSide(36)}>
           <h3 className="problem-card__title">{earlyFlight.problemHeadline}</h3>
           <p className="problem-card__intro">{earlyFlight.problemIntro}</p>
-          <ul className="problem-card__list">
-            {earlyFlight.problems.map((item, i) => (
-              <motion.li
-                key={item}
-                initial={{ opacity: 0, x: 14 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.4, ease, delay: 0.25 + i * 0.09 }}
-              >
+          {/* the worries stack up one at a time, off the card's own reveal */}
+          <motion.ul className="problem-card__list" variants={stagger(0.08, 0.2)}>
+            {earlyFlight.problems.map((item) => (
+              <motion.li key={item} variants={listItem({ x: 14 })}>
                 {item}
               </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         </Reveal>
       </div>
     </section>

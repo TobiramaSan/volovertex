@@ -121,6 +121,12 @@ const paths = {
       <path d="M3 7l9 6 9-6" />
     </>
   ),
+  send: (
+    <>
+      <path d="M21.5 2.5L2.5 9.8l7.4 3.3z" />
+      <path d="M21.5 2.5l-7.3 19-4.3-8.4z" />
+    </>
+  ),
   arrowRight: <path d="M4 12h15M14 6l6 6-6 6" />,
   arrowDown: <path d="M12 4v15M6 14l6 6 6-6" />,
   check: <path d="M4 12.5l5 5L20 6.5" />,
