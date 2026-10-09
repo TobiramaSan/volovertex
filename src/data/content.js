@@ -12,14 +12,18 @@ export const brand = {
 };
 
 // --- Contact -----------------------------------------------------------------
-// Put the real numbers here. `whatsappNumber` is digits only, in international
-// format with no plus sign or spaces (e.g. '2348012345678').
+// `whatsappNumber` and `phoneDial` are turned into links by src/lib/links.js,
+// which strips everything but the digits and prefixes a plus — so both must be
+// in international format (234… for Nigeria, no leading 0) or the wa.me and
+// tel: links will not dial. Spaces and the plus sign are fine here; they are
+// only there to keep the number readable where it is printed on the page.
+// `phoneDisplay` is never dialled, so it carries the local form people know.
 export const contact = {
-  whatsappNumber: '[WHATSAPP NUMBER]',
-  phoneDisplay: '[PHONE NUMBER]',
-  phoneDial: '[PHONE NUMBER]',
-  email: '[EMAIL ADDRESS]',
-  partnershipsEmail: '[PARTNERSHIPS EMAIL]',
+  whatsappNumber: '+234 904 366 4654',
+  phoneDisplay: '0904 366 4654',
+  phoneDial: '+234 904 366 4654',
+  email: 'Volovertex@gmail.com',
+  partnershipsEmail: 'Volovertex@gmail.com',
 };
 
 // Pre-filled WhatsApp messages (section 23 of the brief).
