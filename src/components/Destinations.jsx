@@ -4,7 +4,7 @@ import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { destinations } from '../data/content.js';
 import { requestJourney } from '../lib/links.js';
-import { cardIn, ease, spring, stagger } from '../lib/motion.js';
+import { cardIn, ease, listItem, pinDrop, spring, stagger, viewport } from '../lib/motion.js';
 
 export default function Destinations() {
   const still = useReducedMotion();
@@ -25,12 +25,7 @@ export default function Destinations() {
             >
               <div className="dest-card__head">
                 {/* the pin drops onto the map */}
-                <motion.span
-                  initial={{ y: -8, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  viewport={{ once: true, amount: 0.6 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 18, delay: 0.3 }}
-                >
+                <motion.span variants={pinDrop}>
                   <Icon name="pin" size={20} />
                 </motion.span>
                 <span className="dest-card__status">Live at launch</span>
@@ -66,19 +61,13 @@ export default function Destinations() {
               </motion.span>
               <span className="dest-card__status">{destinations.futureLabel}</span>
             </div>
-            <ul className="dest-future">
-              {destinations.future.map((city, i) => (
-                <motion.li
-                  key={city}
-                  initial={{ opacity: 0, y: 8 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.5 }}
-                  transition={{ duration: 0.35, ease, delay: 0.3 + i * 0.06 }}
-                >
+            <motion.ul className="dest-future" variants={stagger(0.06, 0.25)}>
+              {destinations.future.map((city) => (
+                <motion.li key={city} variants={listItem({ y: 8 })}>
                   {city}
                 </motion.li>
               ))}
-            </ul>
+            </motion.ul>
             <p className="dest-card__body">{destinations.futureNote}</p>
             <motion.a
               href="#request-assistance"

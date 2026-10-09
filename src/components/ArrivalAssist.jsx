@@ -4,9 +4,10 @@ import PhotoSlot from './PhotoSlot.jsx';
 import Reveal from './Reveal.jsx';
 import { arrival, photos } from '../data/content.js';
 import { requestJourney, whatsappLink } from '../lib/links.js';
-import { ease, fadeSide, fadeUp, spring, stagger } from '../lib/motion.js';
+import { ease, fadeSide, fadeUp, spring, stagger, viewport } from '../lib/motion.js';
 
-const inView = { once: true, amount: 0.4 };
+// Every reveal in this scene shares the one policy — see lib/motion.js.
+const inView = viewport;
 
 /**
  * Arrivals: the aircraft comes down the approach while the car and the name
@@ -121,7 +122,7 @@ export default function ArrivalAssist() {
           variants={fadeSide(-34)}
           initial="hidden"
           whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
+          viewport={viewport}
         >
           <ArrivalArt />
         </PhotoSlot>

@@ -4,7 +4,7 @@ import Icon from './Icon.jsx';
 import Reveal from './Reveal.jsx';
 import { contact, finalCta, requestFlow } from '../data/content.js';
 import { mailLink, telLink, whatsappLink } from '../lib/links.js';
-import { ease, fadeUp, spring, stagger } from '../lib/motion.js';
+import { ease, fadeUp, spring, stagger, viewport } from '../lib/motion.js';
 
 const STEPS = [
   { id: 1, label: 'Journey type' },
@@ -238,7 +238,7 @@ export default function RequestAssistance() {
           className="form-card"
           initial={{ opacity: 0, y: 28 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.15 }}
+          viewport={viewport}
           transition={{ duration: 0.6, ease }}
         >
           <AnimatePresence mode="wait" initial={false}>

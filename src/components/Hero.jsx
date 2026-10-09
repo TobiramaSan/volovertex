@@ -36,9 +36,13 @@ function HeroArt() {
   // reducedMotion="user" only trims transforms; an endlessly looping twinkle is
   // exactly what someone asking for less motion does not want, so the ambient
   // loops are switched off outright here rather than merely shortened.
+  // Reduced motion means *movement*, not stillness: the accepted pattern is to
+  // replace movement with a fade rather than strip the fade too. So the opacity
+  // breathing below keeps running either way, and only the things that actually
+  // travel — the streaming dashes, the aircraft's float, the sun's swell — stop.
   const still = useReducedMotion();
-  const loop = (config) => (still ? { duration: 0 } : config);
-  const at = (values) => (still ? undefined : values);
+  const moveLoop = (config) => (still ? { duration: 0 } : config);
+  const move = (values) => (still ? undefined : values);
 
   return (
     <svg className="hero__art" viewBox="0 0 640 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -63,8 +67,8 @@ function HeroArt() {
         height="290"
         fill="url(#vv-dawn)"
         initial={{ opacity: 0.3 }}
-        animate={still ? { opacity: 0.55 } : { opacity: [0.38, 0.62, 0.38] }}
-        transition={loop({ duration: 11, ease: 'easeInOut', repeat: Infinity })}
+        animate={{ opacity: [0.38, 0.62, 0.38] }}
+        transition={{ duration: 11, ease: 'easeInOut', repeat: Infinity }}
       />
 
       {/* stars, each breathing on its own clock */}
@@ -76,13 +80,13 @@ function HeroArt() {
             cy={star.cy}
             r={star.r}
             initial={{ opacity: 0 }}
-            animate={still ? { opacity: 0.55 } : { opacity: [0.2, 0.75, 0.2] }}
-            transition={loop({
+            animate={{ opacity: [0.2, 0.75, 0.2] }}
+            transition={{
               duration: 3.4 + i * 0.6,
               ease: 'easeInOut',
               repeat: Infinity,
               delay: i * 0.45,
-            })}
+            }}
           />
         ))}
       </g>
@@ -94,8 +98,12 @@ function HeroArt() {
         r="86"
         fill="#C9A87C"
         initial={{ opacity: 0.4, scale: 1 }}
-        animate={still ? { opacity: 0.4 } : { opacity: [0.28, 0.48, 0.28], scale: [1, 1.07, 1] }}
-        transition={loop({ duration: 9, ease: 'easeInOut', repeat: Infinity })}
+        animate={
+          still
+            ? { opacity: [0.28, 0.48, 0.28] }
+            : { opacity: [0.28, 0.48, 0.28], scale: [1, 1.07, 1] }
+        }
+        transition={{ duration: 9, ease: 'easeInOut', repeat: Infinity }}
         style={{ originX: '320px', originY: '470px' }}
       />
       <circle cx="320" cy="470" r="52" fill="#C9A87C" opacity="0.85" />
@@ -108,8 +116,8 @@ function HeroArt() {
         strokeDasharray="5 9"
         fill="none"
         opacity="0.65"
-        animate={at({ strokeDashoffset: [0, -28] })}
-        transition={loop({ duration: 2.6, ease: 'linear', repeat: Infinity })}
+        animate={move({ strokeDashoffset: [0, -28] })}
+        transition={moveLoop({ duration: 2.6, ease: 'linear', repeat: Infinity })}
       />
 
       {/* aircraft climbing away, floating on the airstream */}
@@ -120,8 +128,8 @@ function HeroArt() {
           transition={{ duration: 1.5, ease, delay: 0.35 }}
         >
           <motion.g
-            animate={at({ y: [-3.5, 3.5, -3.5] })}
-            transition={loop({ duration: 5.5, ease: 'easeInOut', repeat: Infinity })}
+            animate={move({ y: [-3.5, 3.5, -3.5] })}
+            transition={moveLoop({ duration: 5.5, ease: 'easeInOut', repeat: Infinity })}
           >
             <path
               d="M-30 0 L30 0 M5 0 L-11 -23 L-3 -23 L20 0 M5 0 L-11 23 L-3 23 L20 0 M-27 0 L-34 -11 L-28 -11 L-19 0 M-27 0 L-34 11 L-28 11 L-19 0"
@@ -151,14 +159,14 @@ function HeroArt() {
             width="5"
             height="8"
             initial={{ opacity: 0 }}
-            animate={still ? { opacity: 0.7 } : { opacity: [0, 0.75, 0.55, 0.75] }}
-            transition={loop({
+            animate={{ opacity: [0, 0.75, 0.55, 0.75] }}
+            transition={{
               duration: 4,
               ease: 'easeInOut',
               repeat: Infinity,
               repeatType: 'reverse',
               delay: 0.8 + i * 0.5,
-            })}
+            }}
           />
         ))}
       </g>
@@ -170,8 +178,8 @@ function HeroArt() {
         strokeWidth="1"
         strokeDasharray="14 12"
         opacity="0.35"
-        animate={at({ strokeDashoffset: [0, -52] })}
-        transition={loop({ duration: 2.2, ease: 'linear', repeat: Infinity })}
+        animate={move({ strokeDashoffset: [0, -52] })}
+        transition={moveLoop({ duration: 2.2, ease: 'linear', repeat: Infinity })}
       />
       <g transform="translate(214 664)">
         <motion.g
@@ -188,8 +196,8 @@ function HeroArt() {
             stroke="#C9A87C"
             strokeWidth="2.4"
             strokeLinecap="round"
-            animate={still ? { opacity: 0.9 } : { opacity: [0.55, 1, 0.55] }}
-            transition={loop({ duration: 2.8, ease: 'easeInOut', repeat: Infinity, delay: 2 })}
+            animate={{ opacity: [0.55, 1, 0.55] }}
+            transition={{ duration: 2.8, ease: 'easeInOut', repeat: Infinity, delay: 2 }}
           />
         </motion.g>
       </g>
@@ -200,8 +208,13 @@ function HeroArt() {
 export default function Hero() {
   // The scene drifts slower than the page, which gives the hero a little depth
   // without ever exposing an edge — `.hero__art` is scaled up to leave room.
+  // MotionConfig's reducedMotion only governs animations Motion drives. A value
+  // piped straight into `style`, like this parallax, bypasses it entirely — so
+  // scroll-linked movement has to be switched off by hand. It is also the single
+  // most important thing to disable: scroll parallax is the vestibular trigger.
+  const stillPage = useReducedMotion();
   const { scrollY } = useScroll();
-  const artY = useTransform(scrollY, [0, 900], [-28, 28]);
+  const artY = useTransform(scrollY, [0, 900], stillPage ? [0, 0] : [-28, 28]);
 
   return (
     <section id="top" className="hero">

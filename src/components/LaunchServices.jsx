@@ -4,7 +4,7 @@ import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { launchServices } from '../data/content.js';
 import { requestJourney } from '../lib/links.js';
-import { cardIn, ease, spring, stagger } from '../lib/motion.js';
+import { cardIn, ease, listItem, spring, stagger, viewport } from '../lib/motion.js';
 
 export default function LaunchServices() {
   return (
@@ -44,21 +44,15 @@ export default function LaunchServices() {
               {service.suitableFor && (
                 <div className="service-card__suitable">
                   <p className="micro-label">{service.suitableLabel}</p>
-                  <ul>
-                    {/* each tick lands in turn, so the list reads as it fills */}
-                    {service.suitableFor.map((item, i) => (
-                      <motion.li
-                        key={item}
-                        initial={{ opacity: 0, x: -10 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, amount: 0.6 }}
-                        transition={{ duration: 0.35, ease, delay: 0.15 + i * 0.07 }}
-                      >
+                  {/* each tick lands in turn, so the list reads as it fills */}
+                  <motion.ul variants={stagger(0.07, 0.15)}>
+                    {service.suitableFor.map((item) => (
+                      <motion.li key={item} variants={listItem({ x: -10 })}>
                         <Icon name="check" size={15} strokeWidth={2} />
                         {item}
                       </motion.li>
                     ))}
-                  </ul>
+                  </motion.ul>
                 </div>
               )}
 
