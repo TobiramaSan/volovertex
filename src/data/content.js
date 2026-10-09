@@ -26,6 +26,24 @@ export const contact = {
   partnershipsEmail: 'Volovertex@gmail.com',
 };
 
+// --- Intercom ----------------------------------------------------------------
+// Copy for the in-page chat widget. The visitor composes here and their own
+// WhatsApp sends it, so the note below has to be honest about the hand-off.
+export const intercom = {
+  availability: 'Usually replies in minutes',
+  greeting:
+    'Hello — tell us about your journey and a VoloVertex coordinator will take it from here.',
+  topicsLabel: 'What is it about?',
+  topics: ['To the airport', 'From the airport', 'Early flight', 'Something else'],
+  placeholder: 'Type your message…',
+  sendCta: 'Send on WhatsApp',
+  sendCtaFallback: 'Send',
+  handoffLabel: 'Opening WhatsApp…',
+  handoffNote: 'Opens WhatsApp with your message ready — just press send there.',
+  handoffNoteFallback: 'Takes you to the request form.',
+  fallbackMessage: 'I’d like assistance with my journey.',
+};
+
 // Pre-filled WhatsApp messages (section 23 of the brief).
 export const whatsappMessages = {
   default: "Hello VoloVertex, I’d like assistance with my journey.",

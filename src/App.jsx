@@ -18,12 +18,11 @@ import Faq from './components/Faq.jsx';
 import RequestAssistance from './components/RequestAssistance.jsx';
 import Footer from './components/Footer.jsx';
 import StickyBar from './components/StickyBar.jsx';
+import Intercom from './components/Intercom.jsx';
 import { ease } from './lib/motion.js';
 
 export default function App() {
   return (
-    // reducedMotion="user" lets every animation below stay written the obvious
-    // way: Motion drops transforms to a cross-fade when the OS asks for less.
     <MotionConfig reducedMotion="user" transition={{ duration: 0.55, ease }}>
       <a className="skip-link" href="#main">
         Skip to content
@@ -31,7 +30,6 @@ export default function App() {
       <ScrollProgress />
       <Header />
       <main id="main">
-        {/* Order follows the homepage commercial flow in the brief (section 24). */}
         <Hero />
         <QuickActions />
         <CoreMessage />
@@ -50,6 +48,7 @@ export default function App() {
       </main>
       <Footer />
       <StickyBar />
+      <Intercom />
     </MotionConfig>
   );
 }
