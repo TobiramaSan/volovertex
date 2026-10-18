@@ -19,9 +19,9 @@ export const brand = {
 // only there to keep the number readable where it is printed on the page.
 // `phoneDisplay` is never dialled, so it carries the local form people know.
 export const contact = {
-  whatsappNumber: '+234 904 366 4654',
-  phoneDisplay: '0904 366 4654',
-  phoneDial: '+234 904 366 4654',
+  whatsappNumber: '+234 806 225 3944',
+  phoneDisplay: '0806 225 3944',
+  phoneDial: '+234 806 225 3944',
   email: 'Volovertex@gmail.com',
   partnershipsEmail: 'Volovertex@gmail.com',
 };
