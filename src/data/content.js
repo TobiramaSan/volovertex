@@ -491,6 +491,11 @@ export const requestFlow = {
   ],
   luggageOptions: ['Hand luggage only', '1–2 checked bags', '3–4 checked bags', '5 or more / oversized'],
   submitCta: 'Get my journey plan',
+  errorTitle: 'That did not go through.',
+  errorBody:
+    'Something went wrong saving your request. Please try again, or send us the details on WhatsApp and we will take it from there.',
+  errorRetry: 'Try again',
+  errorWhatsapp: 'Send on WhatsApp instead',
 };
 
 // --- Final homepage CTA (section 25) -----------------------------------------

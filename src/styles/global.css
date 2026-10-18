@@ -1673,6 +1673,43 @@ textarea {
   .logo__word { display: none; }
 }
 
+/* a failed submission, shown inside the form on the pine ground */
+.form-error { overflow: hidden; }
+
+.form-error__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 14px 16px;
+  border: 1px solid rgba(240, 160, 140, 0.5);
+  border-left: 3px solid #f0a08c;
+  border-radius: var(--radius-sm);
+  background: rgba(240, 160, 140, 0.1);
+}
+
+.form-error__title {
+  font-weight: 700;
+  color: #ffd9cf;
+}
+
+.form-error__body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--on-dark);
+}
+
+.form-error__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 /* ==========================================================================
    Intercom
    Floating chat that composes a message and hands it to the visitor's own
