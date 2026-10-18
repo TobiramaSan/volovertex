@@ -23,10 +23,6 @@ export const spring = { type: 'spring', stiffness: 380, damping: 30 };
 export const springSoft = { type: 'spring', stiffness: 260, damping: 32 };
 
 /**
- * Scroll reveals play once and start a little before the element is fully in
- * view, so content is already settled by the time it is worth reading.
- */
-/**
  * Scroll reveals play once, triggered as soon as any part of the element clears
  * the bottom margin.
  *
