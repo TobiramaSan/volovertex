@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Icon from './Icon.jsx';
 import Reveal from './Reveal.jsx';
-import { contact, finalCta, requestFlow } from '../data/content.js';
-import { mailLink, telLink, whatsappLink } from '../lib/links.js';
+import { brand, contact, finalCta, requestFlow } from '../data/content.js';
+import { mailLink, telLink, whatsappCompose, whatsappLink } from '../lib/links.js';
+import { submitJourneyRequest } from '../lib/submitRequest.js';
 import { ease, fadeUp, spring, stagger, viewport } from '../lib/motion.js';
 
 const STEPS = [
@@ -71,7 +72,8 @@ export default function RequestAssistance() {
   const [direction, setDirection] = useState(1);
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState('idle'); // idle | sending | sent
+  const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+  const [throttled, setThrottled] = useState(false);
   const headingRef = useRef(null);
   const shouldFocus = useRef(false);
 
@@ -167,6 +169,7 @@ export default function RequestAssistance() {
       return;
     }
 
+    setThrottled(false);
     setStatus('sending');
 
     const payload = {
@@ -175,21 +178,20 @@ export default function RequestAssistance() {
       submittedAt: new Date().toISOString(),
     };
 
-    // ---------------------------------------------------------------------
-    // TODO: send `payload` to your backend, CRM or form service, e.g.
-    // await fetch('/api/journey-requests', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(payload),
-    // });
-    // ---------------------------------------------------------------------
-    console.info('VoloVertex journey request:', payload);
-
-    await new Promise((r) => setTimeout(r, 700));
-    setStatus('sent');
+    try {
+      await submitJourneyRequest(payload);
+      setStatus('sent');
+    } catch (error) {
+      // Never report a save that did not happen; the banner below offers a
+      // retry and a WhatsApp route so the request is not simply dropped.
+      console.error('[VoloVertex] journey request failed:', error);
+      setThrottled(Boolean(error && error.rateLimited));
+      setStatus('error');
+    }
   };
 
   const reset = () => {
+    setThrottled(false);
     setForm(emptyForm);
     setErrors({});
     setDirection(-1);
@@ -198,6 +200,22 @@ export default function RequestAssistance() {
   };
 
   const firstName = form.name.trim().split(' ')[0];
+
+  // If saving failed, the details they typed should not be lost: hand them to
+  // WhatsApp the same way the intercom does.
+  const fallbackMessage = [
+    `Hello ${brand.name},`,
+    form.journeyType && `Journey: ${form.journeyType}`,
+    form.travelDate &&
+      `Date: ${form.travelDate}${form.flightTime ? ` at ${form.flightTime}` : ''}`,
+    (form.pickupLocation || form.destination) &&
+      `Route: ${form.pickupLocation || '—'} to ${form.destination || '—'}`,
+    form.name && `Name: ${form.name}`,
+    form.phone && `Phone: ${form.phone}`,
+    form.notes && `Notes: ${form.notes}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return (
     <section id="request-assistance" className="section section--pine request" aria-labelledby="request-title">
@@ -589,6 +607,41 @@ export default function RequestAssistance() {
                   </motion.div>
                 </AnimatePresence>
 
+                {/* A failed save keeps the filled-in form rather than replacing
+                    it, so the traveller can retry without retyping — and can
+                    leave via WhatsApp carrying the details they already gave. */}
+                <AnimatePresence initial={false}>
+                  {status === 'error' && (
+                    <motion.div
+                      key="submit-error"
+                      className="form-error"
+                      role="alert"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.26, ease }}
+                    >
+                      <div className="form-error__inner">
+                        <p className="form-error__title">
+                          {throttled ? requestFlow.throttledTitle : requestFlow.errorTitle}
+                        </p>
+                        <p className="form-error__body">
+                          {throttled ? requestFlow.throttledBody : requestFlow.errorBody}
+                        </p>
+                        <a
+                          href={whatsappCompose(fallbackMessage)}
+                          className="form-error__link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Icon name="whatsapp" size={16} />
+                          {requestFlow.errorWhatsapp}
+                        </a>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 <div className="form__nav">
                   <AnimatePresence initial={false}>
                     {step > 1 && (
@@ -642,7 +695,9 @@ export default function RequestAssistance() {
                             : { duration: 0.2 }
                         }
                       >
-                        {status === 'sending' ? 'Sending…' : requestFlow.submitCta}
+                        {status === 'sending' && 'Sending…'}
+                        {status === 'error' && requestFlow.errorRetry}
+                        {status !== 'sending' && status !== 'error' && requestFlow.submitCta}
                       </motion.span>
                     </motion.button>
                   )}
