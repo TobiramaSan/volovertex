@@ -50,3 +50,38 @@ export async function insertJourneyRequest(r) {
   `;
   return rows[0];
 }
+
+/**
+ * Increment the counter for one bucket in the current fixed window and return
+ * the new total.
+ *
+ * The upsert is a single statement, so concurrent requests cannot both read a
+ * stale count and both decide they are under the limit — the increment happens
+ * inside the same statement that creates the row.
+ */
+export async function bumpRateLimit(bucket, windowSeconds) {
+  const sql = client();
+  const rows = await sql`
+    insert into request_rate_limit (bucket, window_start, hits)
+    values (
+      ${bucket},
+      to_timestamp(
+        floor(extract(epoch from now()) / ${windowSeconds}::int) * ${windowSeconds}::int
+      ),
+      1
+    )
+    on conflict (bucket, window_start)
+    do update set hits = request_rate_limit.hits + 1
+    returning hits, window_start
+  `;
+  return rows[0];
+}
+
+/** Drop spent windows. Called occasionally so the table needs no cron job. */
+export async function pruneRateLimit(olderThanSeconds) {
+  const sql = client();
+  await sql`
+    delete from request_rate_limit
+    where window_start < now() - make_interval(secs => ${olderThanSeconds}::int)
+  `;
+}

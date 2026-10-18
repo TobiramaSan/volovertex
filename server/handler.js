@@ -1,6 +1,7 @@
 import { validateJourneyRequest } from './validate.js';
 import { insertJourneyRequest } from './db.js';
 import { sendAlerts, summarise } from './alerts.js';
+import { checkRateLimit } from './rateLimit.js';
 
 /**
  * The journey request endpoint, written against the Web standard Request and
@@ -26,6 +27,7 @@ const json = (status, body) =>
 export function createJourneyRequestHandler({
   insert = insertJourneyRequest,
   alert = sendAlerts,
+  rateLimit = checkRateLimit,
   log = console,
 } = {}) {
   return async function handleJourneyRequest(request) {
@@ -36,6 +38,24 @@ export function createJourneyRequestHandler({
     const declared = Number(request.headers.get('content-length') || 0);
     if (declared > MAX_BODY_BYTES) {
       return json(413, { ok: false, error: 'Payload too large' });
+    }
+
+    // Checked before the body is parsed, so malformed and junk requests consume
+    // quota too. A bot that can spend its allowance on 422s is not limited.
+    const limit = await rateLimit(request, { log });
+    if (!limit.allowed) {
+      log.error(`[journey-requests] rate limited (${limit.reason})`);
+      return new Response(
+        JSON.stringify({ ok: false, error: 'Too many requests' }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+            'Retry-After': String(limit.retryAfter),
+          },
+        }
+      );
     }
 
     let body;

@@ -73,6 +73,7 @@ export default function RequestAssistance() {
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | sending | sent | error
+  const [throttled, setThrottled] = useState(false);
   const headingRef = useRef(null);
   const shouldFocus = useRef(false);
 
@@ -168,6 +169,7 @@ export default function RequestAssistance() {
       return;
     }
 
+    setThrottled(false);
     setStatus('sending');
 
     const payload = {
@@ -183,11 +185,13 @@ export default function RequestAssistance() {
       // Never report a save that did not happen; the banner below offers a
       // retry and a WhatsApp route so the request is not simply dropped.
       console.error('[VoloVertex] journey request failed:', error);
+      setThrottled(Boolean(error && error.rateLimited));
       setStatus('error');
     }
   };
 
   const reset = () => {
+    setThrottled(false);
     setForm(emptyForm);
     setErrors({});
     setDirection(-1);
@@ -618,8 +622,12 @@ export default function RequestAssistance() {
                       transition={{ duration: 0.26, ease }}
                     >
                       <div className="form-error__inner">
-                        <p className="form-error__title">{requestFlow.errorTitle}</p>
-                        <p className="form-error__body">{requestFlow.errorBody}</p>
+                        <p className="form-error__title">
+                          {throttled ? requestFlow.throttledTitle : requestFlow.errorTitle}
+                        </p>
+                        <p className="form-error__body">
+                          {throttled ? requestFlow.throttledBody : requestFlow.errorBody}
+                        </p>
                         <a
                           href={whatsappCompose(fallbackMessage)}
                           className="form-error__link"

@@ -42,6 +42,14 @@ export async function submitJourneyRequest(payload) {
       signal: controller.signal,
     });
 
+    // Being throttled is not the same as something being broken, and the
+    // traveller deserves copy that says so — flagged here so the form can.
+    if (response.status === 429) {
+      const throttled = new Error('Journey request was rate limited');
+      throttled.rateLimited = true;
+      throw throttled;
+    }
+
     if (!response.ok) {
       throw new Error(`Journey request rejected with ${response.status}`);
     }

@@ -495,6 +495,11 @@ export const requestFlow = {
   errorBody:
     'Something went wrong saving your request. Please try again, or send us the details on WhatsApp and we will take it from there.',
   errorRetry: 'Try again',
+  // Being throttled is a different situation from a broken save, so it says so
+  // rather than implying a fault, and still offers the way through.
+  throttledTitle: 'Just a moment.',
+  throttledBody:
+    'We have had a lot of requests from your network. Please wait a minute and try again, or send us the details on WhatsApp and we will pick it up straight away.',
   errorWhatsapp: 'Send on WhatsApp instead',
 };
 
